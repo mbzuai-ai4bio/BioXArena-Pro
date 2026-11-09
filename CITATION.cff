@@ -17,7 +17,7 @@ authors:
     given-names: Le
 year: 2026
 license: MIT
-repository-code: "https://github.com/lokali/BioXArena-Pro"
+repository-code: "https://github.com/mbzuai-ai4bio/BioXArena-Pro"
 url: "https://huggingface.co/datasets/mbzuai-ai4bio/BioXArena-Pro-Public"
 preferred-citation:
   type: article

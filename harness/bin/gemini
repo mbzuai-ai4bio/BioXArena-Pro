@@ -1,0 +1,4 @@
+#!/bin/bash
+# PATH shim: the real Gemini CLI (we used 0.64.0; node + BX_GEMINI_CLI_JS) inside the Landlock sandbox (env BX_PUBLIC / BX_OUTPUT set by run_agent.py).
+[ -n "${BX_GEMINI_CLI_JS:-}" ] || { echo "BX_GEMINI_CLI_JS is not set" >&2; exit 2; }
+exec "${BX_PYTHON:-python}" -I "$(dirname "$(readlink -f "$0")")/../sandbox.py" "$(if [ -n "${BX_NODE_HOME:-}" ]; then echo "$BX_NODE_HOME/bin/node"; else command -v node; fi)" "$BX_GEMINI_CLI_JS" "$@"

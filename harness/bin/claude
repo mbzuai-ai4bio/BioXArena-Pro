@@ -1,0 +1,5 @@
+#!/bin/bash
+# PATH shim: the real Claude Code CLI (we used 2.1.302; BX_CLAUDE_BIN = the claude binary) inside the Landlock sandbox
+# (env BX_PUBLIC / BX_OUTPUT set by run_agent.py).
+[ -n "${BX_CLAUDE_BIN:-}" ] || { echo "BX_CLAUDE_BIN is not set" >&2; exit 2; }
+exec "${BX_PYTHON:-python}" -I "$(dirname "$(readlink -f "$0")")/../sandbox.py" "$BX_CLAUDE_BIN" "$@"

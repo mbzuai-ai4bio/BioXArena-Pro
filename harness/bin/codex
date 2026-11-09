@@ -1,0 +1,9 @@
+#!/bin/bash
+# PATH shim: the real Codex CLI (we used 0.163.0; BX_CODEX_BIN = binary or the npm package's bin/codex.js) inside the Landlock
+# sandbox (env BX_PUBLIC / BX_OUTPUT set by run_agent.py).
+[ -n "${BX_CODEX_BIN:-}" ] || { echo "BX_CODEX_BIN is not set" >&2; exit 2; }
+SB="$(dirname "$(readlink -f "$0")")/../sandbox.py"
+case "$BX_CODEX_BIN" in
+  *.js) exec "${BX_PYTHON:-python}" -I "$SB" "$(if [ -n "${BX_NODE_HOME:-}" ]; then echo "$BX_NODE_HOME/bin/node"; else command -v node; fi)" "$BX_CODEX_BIN" "$@" ;;
+  *)    exec "${BX_PYTHON:-python}" -I "$SB" "$BX_CODEX_BIN" "$@" ;;
+esac

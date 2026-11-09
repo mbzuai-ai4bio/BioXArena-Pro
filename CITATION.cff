@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use BioXArena-Pro, please cite the paper below (manuscript under review)."
+title: "BioXArena-Pro: a research-grade benchmark for autonomous biomedical machine learning agents"
+type: software
+authors:
+  - family-names: Li
+    given-names: Loka
+  - family-names: Zhang
+    given-names: Duzhen
+  - family-names: Du
+    given-names: Xingbo
+  - family-names: Song
+    given-names: Leonard
+  - family-names: Zhang
+    given-names: Kun
+  - family-names: Song
+    given-names: Le
+year: 2026
+license: MIT
+repository-code: "https://github.com/lokali/BioXArena-Pro"
+url: "https://huggingface.co/datasets/mbzuai-ai4bio/BioXArena-Pro-Public"
+preferred-citation:
+  type: article
+  title: "BioXArena-Pro: a research-grade benchmark for autonomous biomedical machine learning agents"
+  authors:
+    - family-names: Li
+      given-names: Loka
+    - family-names: Zhang
+      given-names: Duzhen
+    - family-names: Du
+      given-names: Xingbo
+    - family-names: Song
+      given-names: Leonard
+    - family-names: Zhang
+      given-names: Kun
+    - family-names: Song
+      given-names: Le
+  year: 2026
+  journal: "manuscript under review"

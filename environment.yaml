@@ -1,0 +1,12 @@
+# One environment for every agent and every configuration (Minimal, Gemini CLI, OpenCode, Biomni, MLEvolve).
+# conda env create -f environment.yaml   (then: pip install --no-deps -r requirements_git.txt)
+name: bioxbench
+channels:
+  - defaults
+dependencies:
+  - python=3.11.15
+  - pip
+  - pip:
+      - -r requirements_lock.txt
+variables:
+  PYTHONNOUSERSITE: "1"

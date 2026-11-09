@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env
+config.env
+data/
+outputs/
+archive/
+harness/logs/
+harness/queues/
+smoke/
+agents/MLEvolve/runs/
+*.log

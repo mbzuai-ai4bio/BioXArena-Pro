@@ -1,0 +1,7 @@
+# Three packages of the run environment that are not on PyPI; they were installed from git at these commits.
+# Install AFTER requirements_lock.txt with: pip install --no-deps -r requirements_git.txt
+# fair-esm (ESM-2, import name `esm`) must come after `esm` 3.x from the lock file: both install into the same `esm`
+# package directory, and in the run environment `import esm` is fair-esm 2.0.1 (esm.pretrained.esm2_* available).
+clip @ git+https://github.com/openai/CLIP.git@d05afc436d78f1c48dc0dbf8e5980a9d471f35f6
+DLLogger @ git+https://github.com/NVIDIA/dllogger.git@0478734ff7be75adde8d160e04872664d1c62e5f
+fair-esm @ git+https://github.com/facebookresearch/esm.git@2b369911bb5b4b0dda914521b9475cad1656b2ac

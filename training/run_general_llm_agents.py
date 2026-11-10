@@ -1,4 +1,4 @@
-# BioXArena-Pro Google kit: harness/runners/*.py import only the task-level functions of this file (run_single_task and
+# BioXArena-Pro: harness/runners/*.py import only the task-level functions of this file (run_single_task and
 # helpers). Its standalone command-line entry point (main, .env / default-endpoint handling) is legacy and not used.
 #!/usr/bin/env python3
 """Run general LLM agents on BioXArena-Pro tasks via an OpenAI-compatible API.

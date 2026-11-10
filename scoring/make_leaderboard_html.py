@@ -92,12 +92,12 @@ footer { margin-top:36px; color:var(--text2); font-size:.82em; }
 </div>
 
 <h2>Finished configurations</h2>
-<div class="ctl"><label><input type="checkbox" id="onlyPaper"> only the __NO__ configurations in the NMI paper</label></div>
+<div class="ctl"><label><input type="checkbox" id="onlyPaper"> only the __NO__ configurations in the paper</label></div>
 <div class="tw"><table id="main"></table></div>
 <p class="note">Click a column header to sort. Input tokens include cached input. Agent time is the sum of the 64 task wall
 times. Rows marked <span class="pill">not in paper</span> are on the leaderboard but outside the __NO__ configurations
-the NMI paper reports. __SUB__ = two task cells taken from MLEvolve + Opus 5 because the proxy served empty completions
-for Opus 5.5 on those tasks. __KIT__ = run by a collaborator on the Google kit (MaaS gateway, uid sandbox, shared GPUs):
+the paper reports. __SUB__ = two task cells taken from MLEvolve + Opus 5 because the proxy served empty completions
+for Opus 5.5 on those tasks. __KIT__ = run on a separate machine of the same hardware class through a Gemini-protocol gateway (uid sandbox, partly shared GPUs):
 scores compare, agent time does not. Full footnotes in <code>LEADERBOARD.md</code>.</p>
 
 <h2>Per-task oracle</h2>

@@ -33,7 +33,7 @@ MODEL = {"gpt-6-astra": "GPT-6 Astra", "gpt-6.1-sol": "GPT-6.1 Sol", "gpt-5.6-so
          "deepseek-v4.1-flash-1017": "DeepSeek V4.1 Flash (1017)", "deepseek-v4-pro-0813": "DeepSeek V4 Pro (0813)",
          "gemini-4-argon": "Gemini 4 Argon", "gemini-3.8-flash": "Gemini 3.8 Flash",
          "gemini-3.1-pro-preview": "Gemini 3.1 Pro (preview)"}
-UPSTREAM = {"maas.devops.rednote.life": "MaaS gateway (rednote)", "openrouter.ai": "OpenRouter (paid)"}
+UPSTREAM = {"gateway-v2/genai": "Gemini-protocol gateway", "openrouter.ai": "OpenRouter (paid)"}
 # API that served each published configuration (used when the run directories are not available, i.e. when the leaderboard
 # is rebuilt from scoring/results/*.csv alone). "institutional proxy" = the OpenAI- / Anthropic-compatible API gateway of
 # the authors' institution, which served the GPT and Claude runs of the paper.
@@ -43,14 +43,14 @@ API_LABEL = {m: "institutional proxy" for m in [
     "biomni__claude-opus-5-5", "biomni__gpt-6-astra", "minimal__claude-opus-5-5", "minimal__gpt-6-astra"]}
 API_LABEL.update({m: "OpenRouter (paid)" for m in ["opencode__deepseek-v4.1-flash-1017", "biomni__gemini-3.8-flash", "biomni__deepseek-v4.1-flash-1017",
                                                   "mlevolve__deepseek-v4.1-flash-1017", "minimal__deepseek-v4-pro-0813", "minimal__deepseek-v4.1-flash-1017"]})
-API_LABEL.update({m: "MaaS gateway (rednote)" for m in ["opencode__gemini-3.8-flash", "geminicli__gemini-3.8-flash", "mlevolve__gemini-3.8-flash",
+API_LABEL.update({m: "Gemini-protocol gateway" for m in ["opencode__gemini-3.8-flash", "geminicli__gemini-3.8-flash", "mlevolve__gemini-3.8-flash",
                                                        "geminicli__gemini-3.1-pro-preview", "minimal__gemini-3.8-flash", "minimal__gemini-3.1-pro-preview"]})
 
 
 def API(sums, m=None):
     """Which API actually served the run, read from the run itself rather than guessed from the model name.
     First choice is api_upstream in execution_config.json, the endpoint the runner actually dialled; runs made on the
-    Google kit carry it and are served by a third-party MaaS gateway that no model name reveals. Our own runs predate
+    separate Gemini machine carry it and are served by a Gemini-protocol gateway that no model name reveals. Our own runs predate
     that field, so they fall back to the api_tap's served model ids: this harness routes a vendor-prefixed id
     (deepseek/..., google/...) to OpenRouter and a bare id to the school proxy, so the prefix is the route.
     Both signals beat guessing by name, which labelled Gemini "Google" when it had run on the paid OpenRouter key."""
@@ -76,11 +76,11 @@ SUBST = {"mlevolve__claude-opus-5-5": {
 # configs that exist only to supply such cells: they are not ranked as configurations of their own.
 DONOR_ONLY = {"mlevolve__claude-opus-5"}
 SUB_MARK = "†"
-# Rows run on the Google kit (2026-10-23..27) by a collaborator, through a third-party MaaS gateway: different sandbox
-# backend and shared GPUs, so scores compare but agent time does not. Marked in every table and footnoted.
+# Rows run on a separate machine of the same hardware class through a gateway for the native Gemini protocol, with the
+# harness's uid sandbox backend and partly shared GPUs: scores compare but agent time does not. Marked and footnoted.
 KIT_MARK = "‡"
-KIT_API = "MaaS gateway (rednote)"
-# Per-task oracle: for every task the best score among the 22 configurations the NMI paper reports (all ranked rows
+KIT_API = "Gemini-protocol gateway"
+# Per-task oracle: for every task the best score among the 22 configurations the paper reports (all ranked rows
 # except these three). It is a ceiling for "pick the right agent per task", not a configuration anyone ran, and it is
 # biased upward because each cell is one noisy run and the maximum picks the luckiest one.
 ORACLE_EXCLUDE = {"codexcli__gpt-6.1-sol", "minimal__deepseek-v4-pro-0813", "minimal__gemini-3.1-pro-preview"}
@@ -110,6 +110,8 @@ def local_reruns(sums):
 rows, running, per_task, donors, per_status = [], [], {}, [], {}
 names = sorted({p.name for p in OUT.iterdir() if p.is_dir() and "__" in p.name} if OUT.exists() else set()) 
 names = sorted(set(names) | {p.stem for p in RES.glob("*.csv")})
+# the leaderboard shows the 22 configurations reported in the paper
+names = [m for m in names if m not in ORACLE_EXCLUDE]
 for m in names:
     d = OUT / m; scaf, model = m.split("__", 1); res = RES / f"{m}.csv"; sums = summaries(d) if d.exists() else []
     last = max((s.stat().st_mtime for s in sums), default=0)
@@ -180,7 +182,7 @@ for i, r in enumerate(rows, 1):
              f"{r['runtime_h']:.1f} | {r['in_m']:.2f} / {r['out_m']:.2f} |")
 L.append(f"| – | *Per-task best of {len(ocfg)} (oracle)* | *see below* | – | ***{o_mean:.1f}*** | – | – | – |")
 L += ["", "Input tokens include cached input. Agent time is the sum of the 64 task wall times.", "",
-      f"**Per-task oracle.** For each task, the best score among the {len(ocfg)} configurations used in the NMI paper (all",
+      f"**Per-task oracle.** For each task, the best score among the {len(ocfg)} configurations used in the paper (all",
       "ranked rows except " + ", ".join(f"`{c}`" for c in sorted(ORACLE_EXCLUDE)) + "), averaged over 64 tasks.",
       "It is the ceiling of choosing the right existing agent for every task, not a run, and it is biased upward because",
       "each cell is a single run and the maximum picks the luckiest one. Per-task values and the winning configuration",
@@ -207,10 +209,10 @@ if sub_rows:
           "unaffected, so this is a serving failure rather than a property of the model or the task.", ""]
 kit_rows = [r for r in rows if r["api"] == KIT_API]
 if kit_rows:
-    L += [f"{KIT_MARK} **Run on the Google kit by a collaborator** (2026-10-23 to 10-27), not on this cluster. Same prompt,",
+    L += [f"{KIT_MARK} **Run on a separate machine of the same hardware class** (2026-10-23 to 10-27). Same prompt,",
           "task set, 1 GPU and 7200 s limit, but three things differ, so **scores compare and agent time does not**:",
           "",
-          "- API: `https://maas.devops.rednote.life/gateway-v2/genai`, a third-party MaaS gateway speaking the native Gemini",
+          "- API: a gateway speaking the native Gemini",
           "  protocol. Gemini CLI speaks it natively; Minimal, OpenCode and MLEvolve reach it through an OpenAI-to-native",
           "  bridge that changes no prompt, model or parameter (every recorded call hit `:streamGenerateContent` or",
           "  `:generateContent`; the bridge changes no prompt, model or parameter).",
@@ -219,7 +221,7 @@ if kit_rows:
           "- GPUs were shared with other workloads for part of the round, so wall times include contention.",
           "",
           "Infrastructure failures in this round were rerun as everywhere else: 8 runs that died on gateway HTML/404 or on an",
-          "external SIGKILL (cgroup evidence: no OOM kill) were rerun by the kit operator, all successfully",
+          "external SIGKILL (cgroup evidence: no OOM kill) were rerun on the same machine, all successfully",
           "(rerun records in the authors' archive)."]
     loc = [(r, t) for r in kit_rows for t in r["local_reruns"]]
     if loc:

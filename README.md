@@ -54,32 +54,32 @@ model itself.
 
 The interactive leaderboard, with per-domain, scaffold &times; backbone and per-task views, is at
 **[mbzuai-ai4bio.github.io/BioXArena-Pro](https://mbzuai-ai4bio.github.io/BioXArena-Pro/)**. Scores are &times;100 on a
-common higher-is-better 0&ndash;100 scale; a failed run scores 0. The per-task best of the 22 configurations averages 57.0.
+common higher-is-better 0&ndash;100 scale; a failed run scores 0. Agent time is the wall-clock time summed over the 64 tasks; tokens are in millions (input includes cached prompt tokens). The per-task best of the 22 configurations averages 57.0.
 
-| # | Agent scaffold | Backbone | Mean (x100) | OK / fail | Agent time (h) |
-|---:|---|---|---:|---:|---:|
-| 1 | Codex CLI | GPT-6 Astra | **55.1** | 64 / 0 | 31.9 |
-| 2 | Claude Code | Claude Opus 5.5 | **53.2** | 64 / 0 | 30.5 |
-| 3 | OpenCode | GPT-6 Astra | **53.2** | 64 / 0 | 27.2 |
-| 4 | OpenCode | Claude Opus 5.5 | **53.2** | 64 / 0 | 33.3 |
-| 5 | Claude Code | Claude Opus 5 | **53.0** | 64 / 0 | 51.0 |
-| 6 | MLEvolve | Claude Opus 5.5&dagger; | **52.7** | 64 / 0 | 127.0 |
-| 7 | Biomni | Claude Opus 5.5 | **49.6** | 64 / 0 | 13.4 |
-| 8 | Biomni | GPT-6 Astra | **48.4** | 64 / 0 | 12.6 |
-| 9 | OpenCode | DeepSeek V4.1 Flash (1017) | **47.8** | 61 / 3 | 69.2 |
-| 10 | OpenCode | Gemini 3.8 Flash&Dagger; | **47.8** | 63 / 1 | 33.8 |
-| 11 | Biomni | Gemini 3.8 Flash | **47.2** | 63 / 1 | 29.8 |
-| 12 | MLEvolve | GPT-6 Astra | **46.7** | 63 / 1 | 127.0 |
-| 13 | Gemini CLI | Gemini 3.8 Flash&Dagger; | **46.7** | 62 / 2 | 44.7 |
-| 14 | Minimal | Claude Opus 5.5 | **46.5** | 61 / 3 | 16.5 |
-| 15 | Minimal | GPT-6 Astra | **46.5** | 63 / 1 | 11.2 |
-| 16 | Codex CLI | GPT-5.6 Sol | **45.2** | 64 / 0 | 10.9 |
-| 17 | MLEvolve | Gemini 3.8 Flash&Dagger; | **44.4** | 62 / 2 | 125.3 |
-| 18 | Gemini CLI | Gemini 3.1 Pro (preview)&Dagger; | **41.4** | 61 / 3 | 28.7 |
-| 19 | Biomni | DeepSeek V4.1 Flash (1017) | **40.6** | 58 / 6 | 35.3 |
-| 20 | MLEvolve | DeepSeek V4.1 Flash (1017) | **38.9** | 55 / 9 | 126.3 |
-| 21 | Minimal | Gemini 3.8 Flash&Dagger; | **37.4** | 59 / 5 | 19.9 |
-| 22 | Minimal | DeepSeek V4.1 Flash (1017) | **33.6** | 59 / 5 | 17.3 |
+| # | Agent scaffold | Backbone | Mean (x100) | OK / fail | Agent time (h) | Tokens in (M) | Tokens out (M) |
+|---:|---|---|---:|---:|---:|---:|---:|
+| 1 | Codex CLI | GPT-6 Astra | **55.1** | 64 / 0 | 31.9 | 262.8 | 2.26 |
+| 2 | Claude Code | Claude Opus 5.5 | **53.2** | 64 / 0 | 30.5 | 45.8 | 1.20 |
+| 3 | OpenCode | GPT-6 Astra | **53.2** | 64 / 0 | 27.2 | 224.7 | 1.57 |
+| 4 | OpenCode | Claude Opus 5.5 | **53.2** | 64 / 0 | 33.3 | 60.7 | 1.31 |
+| 5 | Claude Code | Claude Opus 5 | **52.9** | 64 / 0 | 51.0 | 116.5 | 3.01 |
+| 6 | MLEvolve | Claude Opus 5.5&dagger; | **52.7** | 64 / 0 | 127.0 | 272.4 | 30.41 |
+| 7 | Biomni | Claude Opus 5.5 | **49.6** | 64 / 0 | 13.3 | 32.8 | 0.68 |
+| 8 | Biomni | GPT-6 Astra | **48.4** | 64 / 0 | 12.6 | 8.0 | 0.82 |
+| 9 | OpenCode | DeepSeek V4.1 Flash (1017) | **47.8** | 61 / 3 | 69.2 | 171.4 | 3.07 |
+| 10 | OpenCode | Gemini 3.8 Flash&Dagger; | **47.8** | 63 / 1 | 33.8 | 197.1 | 3.41 |
+| 11 | Biomni | Gemini 3.8 Flash | **47.2** | 63 / 1 | 29.8 | 108.3 | 2.72 |
+| 12 | MLEvolve | GPT-6 Astra | **46.7** | 63 / 1 | 127.0 | 155.2 | 11.12 |
+| 13 | Gemini CLI | Gemini 3.8 Flash&Dagger; | **46.7** | 62 / 2 | 44.7 | 279.2 | 4.64 |
+| 14 | Minimal | Claude Opus 5.5 | **46.5** | 61 / 3 | 16.4 | 0.6 | 0.74 |
+| 15 | Minimal | GPT-6 Astra | **46.5** | 63 / 1 | 11.2 | 0.3 | 0.27 |
+| 16 | Codex CLI | GPT-5.6 Sol | **45.2** | 64 / 0 | 10.9 | 63.6 | 0.61 |
+| 17 | MLEvolve | Gemini 3.8 Flash&Dagger; | **44.4** | 62 / 2 | 125.3 | 173.2 | 108.47 |
+| 18 | Gemini CLI | Gemini 3.1 Pro (preview)&Dagger; | **41.4** | 61 / 3 | 28.7 | 104.6 | 1.38 |
+| 19 | Biomni | DeepSeek V4.1 Flash (1017) | **40.6** | 58 / 6 | 35.3 | 115.8 | 2.75 |
+| 20 | MLEvolve | DeepSeek V4.1 Flash (1017) | **38.9** | 55 / 9 | 126.3 | 141.9 | 72.19 |
+| 21 | Minimal | Gemini 3.8 Flash&Dagger; | **37.4** | 59 / 5 | 19.9 | 0.5 | 1.49 |
+| 22 | Minimal | DeepSeek V4.1 Flash (1017) | **33.6** | 59 / 5 | 17.3 | 0.5 | 2.06 |
 
 &dagger; Two task scores taken from MLEvolve with Opus 5, because the API returned empty completions for Opus 5.5 on those
 tasks. &Dagger; Run through a gateway for the native Gemini protocol on a separate machine of the same hardware class; scores

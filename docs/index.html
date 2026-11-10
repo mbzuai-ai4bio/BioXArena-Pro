@@ -166,7 +166,7 @@
   <p>Mean score over the 64 tasks (&times;100); yellow cells are the CLI means over its two backbones.</p>
   <table id="design-vendor"></table></div>
   <div class="design"><h3>Four model-agnostic scaffolds &times; four backbones</h3>
-  <p>Mean score over the 64 tasks (&times;100); yellow cells are the scaffold means (rows) and backbone means (columns); the best configuration is outlined.</p>
+  <p>Mean score over the 64 tasks (&times;100); yellow cells are the scaffold means (rows) and backbone means (columns).</p>
   <table id="design-grid"></table></div>
 </div>
 
@@ -263,7 +263,7 @@ function renderDesigns() {
   const S = ['OpenCode', 'Biomni', 'MLEvolve', 'Minimal'], B = ['Claude Opus 5.5', 'GPT-6 Astra', 'Gemini 3.8 Flash', 'DeepSeek V4.1 Flash (1017)'];
   const all = S.flatMap(s => B.map(b => m(s, b))), best = Math.max(...all);
   let g = '<tr><th></th>' + B.map(b => `<th>${b.replace('Claude ', '').replace(' (1017)', '')}</th>`).join('') + '<td class="gap"></td><th class="sec">Scaffold mean</th></tr>';
-  S.forEach(s => { const v = B.map(b => m(s, b)); g += `<tr><td class="rl">${s}</td>` + v.map(x => `<td class="${x === best ? 'top' : ''}" style="${heat(x)}">${f(x)}</td>`).join('') + `<td class="gap"></td><td class="sec">${f(v.reduce((a, c) => a + c) / v.length)}</td></tr>`; });
+  S.forEach(s => { const v = B.map(b => m(s, b)); g += `<tr><td class="rl">${s}</td>` + v.map(x => `<td style="${heat(x)}">${f(x)}</td>`).join('') + `<td class="gap"></td><td class="sec">${f(v.reduce((a, c) => a + c) / v.length)}</td></tr>`; });
   g += '<tr><td class="gap" colspan="6" style="height:4px"></td></tr>';
   g += '<tr><td class="rl" style="color:var(--yellow)">Backbone mean</td>' + B.map(b => `<td class="sec">${f(S.map(s => m(s, b)).reduce((a, c) => a + c) / S.length)}</td>`).join('') + '<td class="gap"></td><td></td></tr>';
   document.getElementById('design-grid').innerHTML = g;

@@ -8,8 +8,8 @@ answers are supplied from 2_BioXArena-Pro-Data-Private at evaluation time. The a
 the primary-metric contract consolidated in the public `description.md`: each instance's
 primary metric is mapped to [0, 1], then instances are averaged with equal weight.
 v5 (2026-10-17): primary metric = clip(1 - RPS/RPS_climatology, 0, 1) (climatology = public-train class
-frequencies, fixed in evaluator.py). corrected_v2 (2026-10-13): a single instance `multi_origin` whose primary metric is the mean over
-four forecast origins of (Accuracy_t1 + Accuracy_t3) / 2. The
+frequencies, fixed in evaluator.py). The task has a single instance `multi_origin` with two forecast origins in the release; the earlier
+accuracy-based primary metric is kept as a diagnostic only. The
 scientific metric itself remains in the original evaluator so its implementation cannot
 drift from the benchmark scorer.
 """

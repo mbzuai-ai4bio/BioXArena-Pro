@@ -379,7 +379,8 @@ TASK_CONFIG: dict[str, dict[str, Any]] = {
         },
     },
     "sequence-genomics/sirna-knockdown-efficacy": {
-        # v2 (2026-10-13): two evaluation groups instead of four sources. `shrna_sortseq` is
+        # The release test set holds one evaluation group, `sirna_duplex` (1,531 rows), so the score is a
+        # single pooled Pearson centred per source. History, v2 (2026-10-13): two evaluation groups instead of four sources. `shrna_sortseq` is
         # sherwood; `sirna_duplex` pools huesken + ichihara + shmushkovich, whose per-source test
         # sets (549 / 102 / 81 oligos) are far too small to carry a quarter of the score each.
         # Inside `sirna_duplex` truth and prediction are centred per source, so the pooled Pearson

@@ -13,6 +13,6 @@ METRIC_INFO = {
 
 
 def grade(submission: pd.DataFrame, answers: pd.DataFrame, **kwargs) -> float:
-    """corrected_v2: mean over the 4 instances of 0.5*peptide accuracy + 0.5*amino-acid F1
+    """corrected_v2: mean over the 5 instances of 0.5*peptide accuracy + 0.5*amino-acid F1
     (Casanovo mass-based residue matching, 0.5 Da cumulative / 0.1 Da residue tolerance)."""
     return grade_peptide_v2(submission, answers, **kwargs)

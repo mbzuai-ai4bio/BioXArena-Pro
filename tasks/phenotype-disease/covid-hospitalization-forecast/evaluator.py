@@ -11,9 +11,10 @@ if not OUTPUT_DIR:
     raise RuntimeError("OUTPUT_DIR environment variable is required")
 
 OUTPUT_FILE = "output.json"
-# BioXArena-Pro corrected_v2 (2026-10-13): one instance, four forecast origins (50 states each).
+# BioXArena-Pro: one instance, two forecast origins in the release (50 states each).
 # Every metric is computed per origin (y_ref column `week_id`) and averaged over origins;
-# Accuracy_origin_mean = mean over origins of (Accuracy_t1 + Accuracy_t3) / 2 is the primary metric.
+# The primary metric is RPS_skill = clip(1 - RPS / RPS_climatology, 0, 1) (see contract.py and description.md);
+# Accuracy_origin_mean = mean over origins of (Accuracy_t1 + Accuracy_t3) / 2 is reported for diagnostics only.
 INSTANCES = ["multi_origin"]
 
 # 5-class ordinal HTC labels

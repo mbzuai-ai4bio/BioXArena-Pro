@@ -7,7 +7,7 @@
 This repository contains the evaluation code for **BioXArena-Pro**, a benchmark of **64 end-to-end biomedical machine-learning
 tasks in 8 domains** (chemical biology, imaging, network biology, perturbation, phenotype-disease, sequence/genomics,
 single-cell/spatial, structure; 8 tasks per domain). Every task ships public training data, test inputs, a task description
-and a sample submission; the test labels and grading assets are kept in a separate, access-controlled repository. An agent
+and a sample submission; the test labels and grading assets are kept in a separate, access-controlled repository. Predictions on the hidden test sets can be scored on the [BioXArena-Pro competition on Codabench](https://www.codabench.org/competitions/18583/). An agent
 must write runnable code, train a model within a fixed compute budget and submit predictions for the held-out test samples.
 We used this code to evaluate **7 agent scaffolds** (Codex CLI, Claude Code, Gemini CLI, OpenCode, Biomni, MLEvolve and a
 Minimal single-prompt scaffold) with several backbone LLMs under one controlled resource contract; the 22 configurations

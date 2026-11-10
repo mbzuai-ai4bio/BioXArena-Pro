@@ -159,7 +159,7 @@
 <h2 class="section-title">Two experimental designs</h2>
 <div class="designs">
   <div class="design"><h3>Vendor coding CLIs &times; two backbones of their own vendor</h3>
-  <p>Mean score over the 64 tasks (&times;100); yellow cells are the CLI means (rows) and the means of the older and newer backbones (columns).</p>
+  <p>Mean score over the 64 tasks (&times;100); yellow cells are the CLI means over its two backbones.</p>
   <table id="design-vendor"></table></div>
   <div class="design"><h3>Four model-agnostic scaffolds &times; four backbones</h3>
   <p>Mean score over the 64 tasks (&times;100); yellow cells are the scaffold means (rows) and backbone means (columns); the best configuration is outlined.</p>
@@ -255,8 +255,6 @@ function renderDesigns() {
     h += `<tr><td class="rl">${cli}</td><td style="${heat(a)}">${f(a)}<br><small>${sh(o)}</small></td><td style="${heat(b)}">${f(b)}<br><small>${sh(n)}</small></td><td class="gap"></td><td class="sec">${f((a + b) / 2)}</td></tr>`;
   });
   const avg = xs => xs.reduce((p, c) => p + c) / xs.length;
-  h += '<tr><td class="gap" colspan="5" style="height:4px"></td></tr>';
-  h += `<tr><td class="rl" style="color:var(--yellow)">Backbone mean</td><td class="sec">${f(avg(olds))}</td><td class="sec">${f(avg(news))}</td><td class="gap"></td><td></td></tr>`;
   document.getElementById('design-vendor').innerHTML = h;
   const S = ['OpenCode', 'Biomni', 'MLEvolve', 'Minimal'], B = ['Claude Opus 5.5', 'GPT-6 Astra', 'Gemini 3.8 Flash', 'DeepSeek V4.1 Flash (1017)'];
   const all = S.flatMap(s => B.map(b => m(s, b))), best = Math.max(...all);

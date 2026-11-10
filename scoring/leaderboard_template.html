@@ -141,7 +141,7 @@
 
 
 <h2 class="section-title">Overall ranking</h2>
-<p class="note" style="margin-bottom:20px">Every task is scored by the official evaluator and normalized to 0&ndash;1; a task without a valid score (timeout, no or invalid submission, agent failure) counts as 0, and any run longer than 2 h (7,200 s) is a failure even if a submission was written. <strong>Successful</strong>: tasks (out of 76) whose submission passed the task grader. <strong>Task Avg</strong>: mean normalized score over all 76 tasks, with failed tasks scored 0 (used for the ranking). <strong>Domain Avg</strong>: mean of the 9 domain means. <strong>Success-only Avg</strong>: mean score over the successful tasks only.</p>
+<p class="note" style="margin-bottom:20px">Every task is scored by the official evaluator and normalized to 0&ndash;1; a task without a valid score (timeout, no or invalid submission, agent failure) counts as 0, and any run longer than 2 h (7,200 s) is a failure even if a submission was written. <strong>Successful</strong>: tasks (out of 76) whose submission passed the task grader. <strong>Task Avg</strong>: mean normalized score over all 76 tasks, with failed tasks scored 0 (used for the ranking). <strong>Success-only Avg</strong>: mean score over the successful tasks only.</p>
 <div id="summary-cards" class="summary-cards"></div>
 
 <div class="domain-chart" id="domain-section">
@@ -189,11 +189,11 @@ const DETAILS = __DETAILS__;
 function renderMainTable() {
   const doms = ["chemical-biology", "imaging", "network-biology", "perturbation-dynamics", "phenotype-disease", "sequence", "single-cell", "structure", "text-integrated"];
   const short = {'chemical-biology':'Chem','imaging':'Img','network-biology':'Net','perturbation-dynamics':'Pert','phenotype-disease':'Phen','sequence':'Seq','single-cell':'SC','structure':'Str','text-integrated':'Text'};
-  const head = '<tr><th>#</th><th>Agent (Backbone)</th><th>Group</th><th>OK/76</th><th>Fail</th><th>Task Avg</th><th>Domain Avg</th>' + doms.map(d => `<th title="${d}">${short[d]}</th>`).join('') + '</tr>';
-  const best = {}; ['mean_all','domain_avg', ...doms].forEach(c => best[c] = Math.max(...summaries.map(s => c in s.domains ? s.domains[c] : s[c])));
+  const head = '<tr><th>#</th><th>Agent (Backbone)</th><th>Group</th><th>OK/76</th><th>Fail</th><th>Task Avg</th>' + doms.map(d => `<th title="${d}">${short[d]}</th>`).join('') + '</tr>';
+  const best = {}; ['mean_all', ...doms].forEach(c => best[c] = Math.max(...summaries.map(s => c in s.domains ? s.domains[c] : s[c])));
   const fmt = (v, c) => `<td class="${Math.abs(v - best[c]) < 1e-12 ? 'best' : ''}">${(v*100).toFixed(2)}</td>`;
   const body = summaries.map((s, i) => `<tr><td>${i+1}</td><td style="color:${s.color};font-weight:600">${s.display}${s.status === 'interim' ? ' <span style="color:var(--yellow)">[interim]</span>' : ''}</td><td>${s.group}</td>
-     <td class="${s.status === 'interim' ? 'interim' : ''}">${s.eval_ok}</td><td>${s.total - s.eval_ok}</td>${fmt(s.mean_all,'mean_all')}${fmt(s.domain_avg,'domain_avg')}${doms.map(d => fmt(s.domains[d], d)).join('')}</tr>`).join('');
+     <td class="${s.status === 'interim' ? 'interim' : ''}">${s.eval_ok}</td><td>${s.total - s.eval_ok}</td>${fmt(s.mean_all,'mean_all')}${doms.map(d => fmt(s.domains[d], d)).join('')}</tr>`).join('');
   document.getElementById('main-table').innerHTML = `<thead>${head}</thead><tbody>${body}</tbody>`;
 }
 
@@ -228,7 +228,7 @@ function renderSummaryCards() {
       <div class="score" style="color:${s.color}">${(s.mean_all * 100).toFixed(1)}%</div>
       <div class="meta">
         ${s.status === 'interim' ? '<span style="color:var(--yellow)">INTERIM</span> &nbsp;|&nbsp; ' : ''}Successful: ${s.eval_ok} / ${s.total} &nbsp;|&nbsp; Task Avg: ${(s.mean_all * 100).toFixed(2)}% &nbsp;|&nbsp;
-        Domain Avg: ${(s.domain_avg * 100).toFixed(2)}% &nbsp;|&nbsp; Success-only Avg: ${(s.mean_succ * 100).toFixed(1)}%
+        Success-only Avg: ${(s.mean_succ * 100).toFixed(1)}%
       </div>
       <div class="bar-bg"><div class="bar-fill" style="width:${(s.mean_all * 100).toFixed(1)}%;background:${s.color}"></div></div>
     </div>`;

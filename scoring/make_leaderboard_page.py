@@ -121,7 +121,6 @@ R = [("<title>BioXArena Leaderboard</title>", "<title>BioXArena-Pro Leaderboard<
       "Main results of the paper (Fig. 2): 22 agent / backbone configurations on the 64 BioXArena-Pro tasks across 8 domains."),
      ('id="stat-tasks">76<', 'id="stat-tasks">64<'), ('id="stat-domains">9<', 'id="stat-domains">8<'),
      ("tasks (out of 76) whose", "tasks (out of 64) whose"), ("over all 76 tasks", "over all 64 tasks"),
-     ("mean of the 9 domain means", "mean of the 8 domain means"),
      ("Per-task scores (76 tasks &times; 18 configs)", "Per-task scores (64 tasks &times; 22 configs)"),
      ("BioXArena — Multi-modal Biomedical Benchmark for LLM Agents", "BioXArena-Pro — a research-grade benchmark for autonomous biomedical machine learning agents"),
      ('<a href="https://mbzuai-ai4bio.github.io/BioXArena-ProjectPage/" style="color:var(--accent)">Project page</a> &middot; <a href="https://github.com/mbzuai-ai4bio/BioXArena" style="color:var(--accent)">Code</a>',

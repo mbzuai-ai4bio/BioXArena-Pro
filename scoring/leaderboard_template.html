@@ -51,7 +51,10 @@
   tr:hover td { background:rgba(110,118,129,0.05); }
   .best { color:var(--green); font-weight:700; }
   .fail { color:var(--text2); font-style:italic; }
-  .score-cell { font-weight:600; font-variant-numeric:tabular-nums; }
+  .score-cell { font-weight:600; font-variant-numeric:tabular-nums; padding:7px 7px; text-align:right; font-size:0.92em; }
+  th.agent-th { white-space:normal; line-height:1.25; font-size:0.74em; padding:8px 7px; min-width:58px; max-width:92px; text-transform:none; letter-spacing:0; text-align:right; vertical-align:bottom; }
+  td.task-cell { white-space:normal; max-width:250px; min-width:200px; line-height:1.3; padding:7px 10px; position:sticky; left:0; z-index:1; background:var(--surface); box-shadow:2px 0 0 var(--border); }
+  th.task-th { position:sticky; left:0; z-index:3; background:#1b2129; }
   .model-tag { display:block; font-size:0.72em; font-weight:400; color:var(--text2); margin-top:2px; line-height:1.2; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .toggle-label { display:flex; align-items:center; gap:6px; color:var(--text2); font-size:0.9em; cursor:pointer; user-select:none; }
   .toggle-label input { cursor:pointer; }
@@ -310,10 +313,10 @@ function renderTable() {
   // Head
   const suffix = isRaw ? '_raw' : '';
   const thCols = agents.map(a =>
-    `<th onclick="doSort('${a.key}${suffix}')" style="color:${a.color}">${a.name} ${sortCol === a.key + suffix ? (sortAsc ? '&#9650;' : '&#9660;') : ''}</th>`
+    `<th class="agent-th" onclick="doSort('${a.key}${suffix}')" style="color:${a.color}" title="${escapeHtml(a.name)}">${a.short || a.name}${sortCol === a.key + suffix ? (sortAsc ? ' &#9650;' : ' &#9660;') : ''}</th>`
   ).join('');
   document.getElementById('table-head').innerHTML =
-    `<tr><th>#</th><th onclick="doSort('task')">Task ${sortCol==='task'?(sortAsc?'&#9650;':'&#9660;'):''}</th><th onclick="doSort('domain')">Domain ${sortCol==='domain'?(sortAsc?'&#9650;':'&#9660;'):''}</th>${thCols}</tr>`;
+    `<tr><th>#</th><th class="task-th" onclick="doSort('task')">Task ${sortCol==='task'?(sortAsc?'&#9650;':'&#9660;'):''}</th><th onclick="doSort('domain')">Domain ${sortCol==='domain'?(sortAsc?'&#9650;':'&#9660;'):''}</th>${thCols}</tr>`;
 
   // Find best per row
   const rows = filtered.map((t, idx) => {
@@ -340,7 +343,7 @@ function renderTable() {
 
     return `<tr>
       <td style="color:var(--text2)">${idx + 1}</td>
-      <td><span class="task-link" onclick="showModal('${t.task}','${t.domain}')">${t.task}</span></td>
+      <td class="task-cell"><span class="task-link" onclick="showModal('${t.task}','${t.domain}')">${t.task.replace(/-/g, '-&#8203;')}</span></td>
       <td><span class="domain-badge ${domClass}">${domLabel}</span></td>
       ${cells}
     </tr>`;

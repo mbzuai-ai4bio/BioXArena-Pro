@@ -41,12 +41,22 @@ for i, r in enumerate(lb):
     if r["substituted_tasks"]: name += " †"
     if r["api"] == "Gemini-protocol gateway": name += " ‡"
     key = re.sub(r"[^a-z0-9]", "_", c)
-    agents.append({"key": key, "name": name, "color": COLORS[i % len(COLORS)]})
+    SS = {"Codex CLI": "Codex", "Claude Code": "Claude Code", "Gemini CLI": "Gemini CLI", "OpenCode": "OpenCode",
+          "Biomni": "Biomni", "MLEvolve": "MLEvolve", "Minimal": "Minimal"}
+    SB = {"GPT-6 Astra": "GPT-6 Astra", "GPT-5.6 Sol": "GPT-5.6 Sol", "Claude Opus 5.5": "Opus 5.5", "Claude Opus 5": "Opus 5",
+          "Gemini 3.8 Flash": "Gem 3.8 Flash", "Gemini 3.1 Pro (preview)": "Gem 3.1 Pro", "DeepSeek V4.1 Flash (1017)": "DS V4.1 Flash"}
+    mk = (" \u2020" if r["substituted_tasks"] else "") + (" \u2021" if r["api"] == "Gemini-protocol gateway" else "")
+    short = f"{SS[r['scaffold']]}<br>{SB.get(r['backend'], r['backend'])}{mk}"
+    agents.append({"key": key, "name": name, "short": short, "color": COLORS[i % len(COLORS)]})
     res = {q["task"]: q for q in csv.DictReader(open(SRES / f"{c}.csv"))}
     cells[key] = {}
     for k in task_keys:
         q = res.get(k, {}); s = pt[k].get(c); sc = float(s) / 100 if s not in (None, "") else 0.0
-        ok = q.get("status") == "ok"
+        st = q.get("status") or ""
+        subst = k.split("/")[1] in (r["substituted_tasks"] or "") or k in (r["substituted_tasks"] or "")
+        ok = st.startswith("ok") or (subst and sc > 0)
+        if subst: q = dict(q, note="score taken from MLEvolve + Claude Opus 5 (the API returned empty completions for Opus 5.5)")
+        elif st == "ok_safety_fallback": q = dict(q, note="completed by the CLI's built-in refusal fallback (Opus 5) after a biosafety refusal")
         raw = q.get("raw"); raw = float(raw) if raw not in (None, "", "nan") else None
         rows[k][key] = sc; rows[k][key + "_raw"] = raw
         if not ok:
@@ -55,7 +65,7 @@ for i, r in enumerate(lb):
              "r_status": q.get("status"), "r_duration_sec": float(q["runtime_sec"]) if q.get("runtime_sec") else None,
              "r_input_tokens": int(float(q["input_tokens_total"])) if q.get("input_tokens_total") else None,
              "r_output_tokens": int(float(q["output_tokens_total"])) if q.get("output_tokens_total") else None}
-        if not ok: d["eval_remark"] = redact(q.get("note") or "")
+        if not ok or q.get("note"): d["eval_remark"] = redact(q.get("note") or "")
         mp = RUNS / c / RENAME.get(k, k) / "metrics.json"
         if mp.exists():
             try:

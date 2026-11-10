@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BioXArena Leaderboard</title>
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --text2: #8b949e; --accent: #58a6ff;
+    --green: #3fb950; --yellow: #d29922; --orange: #db6d28;
+    --red: #f85149; --purple: #bc8cff; --teal: #2dd4bf;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
+  .container { max-width:1400px; margin:0 auto; padding:24px; }
+
+  .header { text-align:center; padding:48px 0 32px; border-bottom:1px solid var(--border); margin-bottom:32px; }
+  .header h1 { font-size:2.5em; font-weight:700; }
+  .header h1 span { color:var(--accent); }
+  .header p { color:var(--text2); font-size:1.1em; max-width:700px; margin:8px auto 0; }
+  .stats { display:flex; justify-content:center; gap:48px; margin-top:24px; flex-wrap:wrap; }
+  .stat { text-align:center; }
+  .stat .value { font-size:2em; font-weight:700; color:var(--accent); }
+  .stat .label { font-size:0.85em; color:var(--text2); }
+
+  .summary-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; margin-bottom:32px; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; }
+  .card h3 { font-size:0.9em; color:var(--text2); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; }
+  .card .name { font-size:1.3em; font-weight:600; margin-bottom:4px; }
+  .card .score { font-size:2.2em; font-weight:700; }
+  .card .meta { color:var(--text2); font-size:0.85em; margin-top:8px; }
+  .bar-bg { height:8px; background:var(--border); border-radius:4px; overflow:hidden; margin-top:8px; }
+  .bar-fill { height:100%; border-radius:4px; }
+
+  .controls { display:flex; gap:12px; margin:16px 0; flex-wrap:wrap; align-items:center; }
+  .search-input, .filter-select { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:8px 12px; color:var(--text); font-size:0.9em; outline:none; }
+  .search-input { width:260px; }
+  .search-input:focus, .filter-select:focus { border-color:var(--accent); }
+
+  .tabs { display:flex; gap:0; border-bottom:1px solid var(--border); overflow-x:auto; margin-bottom:0; }
+  .tab { padding:12px 20px; cursor:pointer; color:var(--text2); border:none; border-bottom:2px solid transparent; font-size:0.95em; white-space:nowrap; background:none; font-family:inherit; }
+  .tab:hover { color:var(--text); }
+  .tab.active { color:var(--accent); border-bottom-color:var(--accent); font-weight:600; }
+
+  .table-wrapper { background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:0.9em; }
+  th { padding:12px 16px; text-align:left; background:rgba(110,118,129,0.1); color:var(--text2); font-weight:600; font-size:0.85em; text-transform:uppercase; letter-spacing:0.3px; cursor:pointer; white-space:nowrap; position:sticky; top:0; }
+  th:hover { color:var(--text); }
+  td { padding:10px 16px; border-top:1px solid var(--border); white-space:nowrap; }
+  tr:hover td { background:rgba(110,118,129,0.05); }
+  .best { color:var(--green); font-weight:700; }
+  .fail { color:var(--text2); font-style:italic; }
+  .score-cell { font-weight:600; font-variant-numeric:tabular-nums; }
+  .model-tag { display:block; font-size:0.72em; font-weight:400; color:var(--text2); margin-top:2px; line-height:1.2; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .toggle-label { display:flex; align-items:center; gap:6px; color:var(--text2); font-size:0.9em; cursor:pointer; user-select:none; }
+  .toggle-label input { cursor:pointer; }
+
+  .domain-badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:0.8em; font-weight:500; }
+  .domain-badge.chemical-biology { background:rgba(63,185,80,0.15); color:var(--green); }
+  .domain-badge.imaging { background:rgba(219,109,40,0.15); color:var(--orange); }
+  .domain-badge.network-biology { background:rgba(188,140,255,0.15); color:var(--purple); }
+  .domain-badge.perturbation-dynamics { background:rgba(210,153,34,0.15); color:var(--yellow); }
+  .domain-badge.phenotype-disease { background:rgba(248,81,73,0.15); color:var(--red); }
+  .domain-badge.sequence { background:rgba(88,166,255,0.15); color:var(--accent); }
+  .domain-badge.single-cell { background:rgba(248,81,73,0.15); color:#f97583; }
+  .domain-badge.structure { background:rgba(63,185,80,0.15); color:#56d364; }
+  .domain-badge.text-integrated { background:rgba(188,140,255,0.15); color:#d2a8ff; }
+
+  .domain-chart { margin:32px 0; }
+  .domain-chart h2 { margin-bottom:16px; font-size:1.3em; }
+  .chart-row { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .chart-label { width:180px; text-align:right; font-size:0.9em; color:var(--text2); flex-shrink:0; }
+  .chart-bars { flex:1; display:flex; gap:4px; }
+  .chart-bar { height:24px; border-radius:4px; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; font-size:0.75em; font-weight:600; min-width:30px; }
+
+  .legend { display:flex; gap:24px; margin:16px 0; flex-wrap:wrap; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:0.9em; }
+  .legend-dot { width:12px; height:12px; border-radius:3px; }
+
+  footer { text-align:center; padding:32px 0; color:var(--text2); font-size:0.85em; border-top:1px solid var(--border); margin-top:48px; }
+
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:flex-start; padding:40px 20px; overflow-y:auto; }
+  .modal-overlay.active { display:flex; }
+  .modal { background:var(--surface); border:1px solid var(--border); border-radius:12px; max-width:800px; width:100%; position:relative; animation:modalIn 0.2s ease; }
+  @keyframes modalIn { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+  .modal-close { position:absolute; top:16px; right:16px; background:none; border:none; color:var(--text2); font-size:1.5em; cursor:pointer; width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:6px; }
+  .modal-close:hover { background:var(--border); color:var(--text); }
+  .modal-header { padding:24px 24px 0; border-bottom:1px solid var(--border); padding-bottom:16px; }
+  .modal-header h2 { font-size:1.4em; margin-bottom:8px; padding-right:40px; }
+  .modal-body { padding:24px; }
+  .modal-body h3 { font-size:1em; color:var(--accent); margin:20px 0 8px; text-transform:uppercase; letter-spacing:0.5px; }
+  .modal-body h3:first-child { margin-top:0; }
+  .modal-body p { color:var(--text2); margin-bottom:12px; line-height:1.7; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0; }
+  .info-item { background:#1c2129; border:1px solid var(--border); border-radius:8px; padding:12px 16px; }
+  .info-item .info-label { font-size:0.8em; color:var(--text2); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:4px; }
+  .info-item .info-value { font-size:1.1em; font-weight:600; }
+  .scores-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin:16px 0; }
+  .score-card { background:#1c2129; border:1px solid var(--border); border-radius:8px; padding:16px; text-align:center; }
+  .score-card .agent-label { font-size:0.8em; color:var(--text2); margin-bottom:6px; }
+  .score-card .agent-score { font-size:1.6em; font-weight:700; }
+  .task-link { color:var(--accent); cursor:pointer; text-decoration:none; border-bottom:1px dashed rgba(88,166,255,0.3); }
+  .task-link:hover { border-bottom-color:var(--accent); }
+
+  .main-table th, .main-table td { padding:8px 10px; text-align:right; white-space:nowrap; }
+  .main-table th:nth-child(-n+3), .main-table td:nth-child(-n+3) { text-align:left; }
+  .main-table td.interim { color:var(--yellow); }
+  .note { color:var(--text2); font-size:0.88em; margin:10px 0; line-height:1.55; }
+  .note strong { color:var(--text); }
+  .section-title { font-size:1.3em; margin:28px 0 12px; }
+  .adj { color:var(--yellow); }
+  td.clickable { cursor:pointer; } td.clickable:hover { outline:1px solid var(--accent); }
+  .kv { width:100%; border-collapse:collapse; font-size:0.86em; margin:6px 0 14px; }
+  .kv td { padding:5px 8px; border-bottom:1px solid var(--border); vertical-align:top; text-align:left; white-space:normal; }
+  .kv td:first-child { color:var(--text2); width:210px; }
+  .md { font-size:0.88em; line-height:1.6; } .md h1,.md h2,.md h3 { margin:12px 0 6px; } .md p,.md ul,.md ol { margin:6px 0; } .md ul,.md ol { padding-left:22px; }
+  .md code, .kv code { background:#1c2129; padding:1px 4px; border-radius:4px; font-size:0.92em; } .md pre { background:#1c2129; padding:10px; border-radius:6px; overflow-x:auto; }
+  .md table { border-collapse:collapse; margin:8px 0; } .md th,.md td { border:1px solid var(--border); padding:4px 8px; }
+  .pill { display:inline-block; padding:1px 8px; border-radius:10px; font-size:0.8em; margin-right:4px; }
+  .pill.yes { background:rgba(63,185,80,0.18); color:var(--green); } .pill.no { background:rgba(139,148,158,0.18); color:var(--text2); }
+  .pill.fail { background:rgba(248,81,73,0.18); color:var(--red); } .pill.ok { background:rgba(63,185,80,0.18); color:var(--green); }
+  .failbox { background:rgba(248,81,73,0.08); border:1px solid rgba(248,81,73,0.4); border-radius:6px; padding:10px 12px; margin:8px 0 14px; font-size:0.86em; white-space:pre-wrap; word-break:break-word; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>Bio<span>X</span>Arena Leaderboard</h1>
+  <p>Main results of the NeurIPS 2026 paper (Figure 3): 18 agent / backbone configurations on the 76 BioXArena tasks across 9 domains. Click a task name for its description, or a score for the details of that run.</p>
+  <div class="stats">
+    <div class="stat"><div class="value" id="stat-tasks">76</div><div class="label">Tasks</div></div>
+    <div class="stat"><div class="value" id="stat-domains">9</div><div class="label">Domains</div></div>
+    <div class="stat"><div class="value" id="stat-agents">0</div><div class="label">Agent configs</div></div>
+  </div>
+</div>
+
+
+<h2 class="section-title">Overall ranking</h2>
+<p class="note" style="margin-bottom:20px">Every task is scored by the official evaluator and normalized to 0&ndash;1; a task without a valid score (timeout, no or invalid submission, agent failure) counts as 0, and any run longer than 2 h (7,200 s) is a failure even if a submission was written. <strong>Successful</strong>: tasks (out of 76) whose submission passed the task grader. <strong>Task Avg</strong>: mean normalized score over all 76 tasks, with failed tasks scored 0 (used for the ranking). <strong>Domain Avg</strong>: mean of the 9 domain means. <strong>Success-only Avg</strong>: mean score over the successful tasks only.</p>
+<div id="summary-cards" class="summary-cards"></div>
+
+<div class="domain-chart" id="domain-section">
+  <h2>Performance by Domain</h2>
+  <div class="legend" id="legend"></div>
+  <div id="domain-chart"></div>
+</div>
+
+<h2 class="section-title">Per-task scores (76 tasks &times; 18 configs)</h2>
+<div class="tabs" id="tabs"></div>
+<div class="controls">
+  <input class="search-input" id="search" placeholder="Search tasks..." oninput="renderTable()">
+</div>
+<div class="table-wrapper">
+  <table>
+    <thead id="table-head"></thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
+
+<footer>
+  BioXArena — Multi-modal Biomedical Benchmark for LLM Agents<br>
+  <a href="https://mbzuai-ai4bio.github.io/BioXArena-ProjectPage/" style="color:var(--accent)">Project page</a> &middot; <a href="https://github.com/mbzuai-ai4bio/BioXArena" style="color:var(--accent)">Code</a> &middot; Last updated: <span id="update-date"></span>
+</footer>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div class="modal-header" id="modal-header"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script>
+// ===== DATA (generated by scripts/build_leaderboard.py) =====
+const tasks = __TASKS__;
+const agents = __AGENTS__;
+const summaries = __SUMMARIES__;
+const DESCRIPTIONS = {};
+const DETAILS = __DETAILS__;
+
+// ===== MAIN RESULTS TABLE (Figure 3) =====
+function renderMainTable() {
+  const doms = ["chemical-biology", "imaging", "network-biology", "perturbation-dynamics", "phenotype-disease", "sequence", "single-cell", "structure", "text-integrated"];
+  const short = {'chemical-biology':'Chem','imaging':'Img','network-biology':'Net','perturbation-dynamics':'Pert','phenotype-disease':'Phen','sequence':'Seq','single-cell':'SC','structure':'Str','text-integrated':'Text'};
+  const head = '<tr><th>#</th><th>Agent (Backbone)</th><th>Group</th><th>OK/76</th><th>Fail</th><th>Task Avg</th><th>Domain Avg</th>' + doms.map(d => `<th title="${d}">${short[d]}</th>`).join('') + '</tr>';
+  const best = {}; ['mean_all','domain_avg', ...doms].forEach(c => best[c] = Math.max(...summaries.map(s => c in s.domains ? s.domains[c] : s[c])));
+  const fmt = (v, c) => `<td class="${Math.abs(v - best[c]) < 1e-12 ? 'best' : ''}">${(v*100).toFixed(2)}</td>`;
+  const body = summaries.map((s, i) => `<tr><td>${i+1}</td><td style="color:${s.color};font-weight:600">${s.display}${s.status === 'interim' ? ' <span style="color:var(--yellow)">[interim]</span>' : ''}</td><td>${s.group}</td>
+     <td class="${s.status === 'interim' ? 'interim' : ''}">${s.eval_ok}</td><td>${s.total - s.eval_ok}</td>${fmt(s.mean_all,'mean_all')}${fmt(s.domain_avg,'domain_avg')}${doms.map(d => fmt(s.domains[d], d)).join('')}</tr>`).join('');
+  document.getElementById('main-table').innerHTML = `<thead>${head}</thead><tbody>${body}</tbody>`;
+}
+
+// ===== STATE =====
+let currentDomain = 'all';
+let sortCol = 'mean_all';
+let sortAsc = false;
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('stat-agents').textContent = agents.filter(a => !a.correctedSubset).length;
+  document.getElementById('update-date').textContent = '2026-10-13';
+  renderSummaryCards();
+  renderDomainChart();
+  renderTabs();
+  renderTable();
+});
+
+// ===== SUMMARY CARDS =====
+// Extra descriptions for agents that need config clarification
+const agentDescriptions = DESCRIPTIONS;
+
+function renderSummaryCards() {
+  const el = document.getElementById('summary-cards');
+  el.innerHTML = summaries.map((s, i) => {
+    const desc = agentDescriptions[s.display] || "";
+    return `
+    <div class="card">
+      <h3>#${i+1} Overall &middot; ${s.group}</h3>
+      <div class="name" style="color:${s.color}">${s.display}</div>
+      ${desc ? `<div style="font-size:0.78em;color:var(--text2);margin:2px 0 6px;line-height:1.4;">${desc}</div>` : ''}
+      <div class="score" style="color:${s.color}">${(s.mean_all * 100).toFixed(1)}%</div>
+      <div class="meta">
+        ${s.status === 'interim' ? '<span style="color:var(--yellow)">INTERIM</span> &nbsp;|&nbsp; ' : ''}Successful: ${s.eval_ok} / ${s.total} &nbsp;|&nbsp; Task Avg: ${(s.mean_all * 100).toFixed(2)}% &nbsp;|&nbsp;
+        Domain Avg: ${(s.domain_avg * 100).toFixed(2)}% &nbsp;|&nbsp; Success-only Avg: ${(s.mean_succ * 100).toFixed(1)}%
+      </div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${(s.mean_all * 100).toFixed(1)}%;background:${s.color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ===== DOMAIN CHART =====
+function renderDomainChart() {
+  const chartAgents = agents.filter(a => !a.correctedSubset);
+  const domains = [...new Set(tasks.map(t => t.domain))].sort();
+  // legend
+  document.getElementById('legend').innerHTML = chartAgents.map(a =>
+    `<div class="legend-item"><div class="legend-dot" style="background:${a.color}"></div>${a.name}</div>`
+  ).join('');
+
+  const chartEl = document.getElementById('domain-chart');
+  chartEl.innerHTML = domains.map(dom => {
+    const domTasks = tasks.filter(t => t.domain === dom);
+    const bars = chartAgents.map(a => {
+      const scores = domTasks.map(t => t[a.key]).filter(v => v != null);
+      const mean = scores.length ? scores.reduce((s,v) => s+v, 0) / domTasks.length : 0;
+      const pct = (mean * 100).toFixed(1);
+      return `<div class="chart-bar" style="width:${Math.max(pct, 2)}%;background:${a.color}" title="${a.name}: ${pct}%">${pct > 10 ? pct + '%' : ''}</div>`;
+    }).join('');
+    const label = dom.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    return `<div class="chart-row"><div class="chart-label">${label}</div><div class="chart-bars">${bars}</div></div>`;
+  }).join('');
+}
+
+// ===== TABS =====
+function renderTabs() {
+  const domains = ['all', ...new Set(tasks.map(t => t.domain))];
+  document.getElementById('tabs').innerHTML = domains.map(d => {
+    const label = d === 'all' ? 'All Tasks' : d.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    return `<button class="tab ${d === currentDomain ? 'active' : ''}" onclick="setDomain('${d}')">${label}</button>`;
+  }).join('');
+}
+
+function setDomain(d) {
+  currentDomain = d;
+  renderTabs();
+  renderTable();
+}
+
+// ===== TABLE =====
+function shortModelName(m) {
+  if (!m) return '';
+  // Drop parenthetical/qualifier suffixes so long descriptions collapse to family
+  let s = String(m).split('(')[0].trim();
+  if (s.length > 22) s = s.substring(0, 20) + '…';
+  return s;
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function renderTable() {
+  const search = document.getElementById('search').value.toLowerCase();
+  const scoreType = 'normalized';   // raw scores are shown in the cell details
+  const isRaw = scoreType === 'raw';
+  const showModels = false;
+
+  let filtered = tasks.filter(t => {
+    if (currentDomain !== 'all' && t.domain !== currentDomain) return false;
+    if (search && !t.task.toLowerCase().includes(search) && !t.domain.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  // Sort
+  if (sortCol === 'task' || sortCol === 'domain') {
+    filtered.sort((a, b) => sortAsc ? a[sortCol].localeCompare(b[sortCol]) : b[sortCol].localeCompare(a[sortCol]));
+  } else {
+    filtered.sort((a, b) => {
+      const va = a[sortCol] ?? -1, vb = b[sortCol] ?? -1;
+      return sortAsc ? va - vb : vb - va;
+    });
+  }
+
+  // Head
+  const suffix = isRaw ? '_raw' : '';
+  const thCols = agents.map(a =>
+    `<th onclick="doSort('${a.key}${suffix}')" style="color:${a.color}">${a.name} ${sortCol === a.key + suffix ? (sortAsc ? '&#9650;' : '&#9660;') : ''}</th>`
+  ).join('');
+  document.getElementById('table-head').innerHTML =
+    `<tr><th>#</th><th onclick="doSort('task')">Task ${sortCol==='task'?(sortAsc?'&#9650;':'&#9660;'):''}</th><th onclick="doSort('domain')">Domain ${sortCol==='domain'?(sortAsc?'&#9650;':'&#9660;'):''}</th>${thCols}</tr>`;
+
+  // Find best per row
+  const rows = filtered.map((t, idx) => {
+    const vals = agents.filter(a => !a.correctedSubset).map(a => ({ key: a.key, val: isRaw ? t[a.key + '_raw'] : t[a.key] }));
+    const validVals = vals.filter(v => v.val != null);
+    const bestVal = validVals.length ? Math.max(...validVals.map(v => v.val)) : null;
+    const bestKeys = new Set(validVals.filter(v => v.val === bestVal).map(v => v.key));
+
+    const domClass = t.domain;
+    const domLabel = t.domain.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+    const cells = agents.map(a => {
+      const v = isRaw ? t[a.key + '_raw'] : t[a.key];
+      const fullModel = t[a.key + '_model'];
+      if (t[a.key + '_status'] === 'Fail') return `<td onclick="showCell('${t.domain}/${t.task}','${a.key}')" class="score-cell clickable fail" title="${escapeHtml(t[a.key + '_remark'] || 'Evaluation failed')}">${isRaw ? '--' : '0.0%'}<span class="model-tag">Failed</span></td>`;
+      const titleAttr = fullModel ? ` title="${escapeHtml(fullModel)}"` : '';
+      if (v == null) return a.correctedSubset ? `<td onclick="showCell('${t.domain}/${t.task}','${a.key}')" class="score-cell clickable" title="Not rerun on corrected data">—</td>` : `<td onclick="showCell('${t.domain}/${t.task}','${a.key}')" class="score-cell clickable fail"${titleAttr}>--</td>`;
+      const cls = bestKeys.has(a.key) ? 'best' : '';
+      const modelLine = (showModels && fullModel)
+        ? `<span class="model-tag">${escapeHtml(shortModelName(fullModel))}</span>`
+        : '';
+      return `<td onclick="showCell('${t.domain}/${t.task}','${a.key}')" class="score-cell clickable ${cls}"${titleAttr}>${isRaw ? v.toFixed(4) : (v * 100).toFixed(1) + '%'}${modelLine}</td>`;
+    }).join('');
+
+    return `<tr>
+      <td style="color:var(--text2)">${idx + 1}</td>
+      <td><span class="task-link" onclick="showModal('${t.task}','${t.domain}')">${t.task}</span></td>
+      <td><span class="domain-badge ${domClass}">${domLabel}</span></td>
+      ${cells}
+    </tr>`;
+  }).join('');
+
+  document.getElementById('table-body').innerHTML = rows;
+}
+
+function doSort(col) {
+  if (sortCol === col) sortAsc = !sortAsc;
+  else { sortCol = col; sortAsc = false; }
+  renderTable();
+}
+
+// ===== MODAL =====
+function showModal(taskName, domain) {
+  const t = tasks.find(x => x.task === taskName && x.domain === domain);
+  if (!t) return;
+
+  const domLabel = domain.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  document.getElementById('modal-header').innerHTML = `
+    <h2>${taskName}</h2>
+    <span class="domain-badge ${domain}">${domLabel}</span>
+  `;
+
+  const scores = agents.map(a => {
+    const v = t[a.key];
+    const raw = t[a.key + '_raw'];
+    const rd = t[a.key + '_round'];
+    const model = t[a.key + '_model'];
+    const failureNote = t[a.key + '_status'] === 'Fail' ? `<div class="fail">Failed (counted as 0): ${escapeHtml(t[a.key + '_remark'] || '')}</div>` : '';
+    return `<div class="score-card">
+      <div class="agent-label" style="color:${a.color}">${a.name}</div>
+      <div class="agent-score" style="color:${v != null ? a.color : 'var(--text2)'}">${v != null ? (v * 100).toFixed(1) + '%' : '--'}</div>
+      <div style="font-size:0.75em;color:var(--text2);margin-top:4px">
+        ${raw != null ? 'Raw: ' + raw.toFixed(4) : ''}
+        ${rd ? ' | ' + rd : ''}
+      </div>
+      ${failureNote}
+      ${model ? `<div style="font-size:0.72em;color:var(--text);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);word-break:break-word;line-height:1.3;">${escapeHtml(model)}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  document.getElementById('modal-body').innerHTML = `
+    <h3>Agent Scores</h3>
+    <div class="scores-grid">${scores}</div>
+  `;
+
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('active');
+}
+
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ===== DETAIL MODALS (task details, per-cell run details) =====
+// Declared after the reference code, so this showModal replaces the reference version.
+const DOMAIN_LABEL = d => d.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+const fmtNum = v => (v == null || v === '') ? '—' : (typeof v === 'number' ? (Number.isInteger(v) ? v.toLocaleString('en-US') : v.toLocaleString('en-US', {maximumFractionDigits: 4})) : escapeHtml(String(v)));
+function fmtSec(s) {
+  if (s == null || isNaN(s)) return '—';
+  s = Number(s); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = Math.round(s % 60);
+  return (h ? `${h}h ` : '') + (h || m ? `${m}m ` : '') + `${r}s` + ` <span style="color:var(--text2)">(${s.toFixed(0)} s)</span>`;
+}
+const kvRows = rows => rows.filter(r => r[1] != null && r[1] !== '' && r[1] !== '—').map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
+const pill = (v) => { const y = String(v).toLowerCase(); return `<span class="pill ${y === 'yes' ? 'yes' : 'no'}">${escapeHtml(String(v))}</span>`; };
+function renderMd(md) {
+  try { if (window.marked) return `<div class="md">${marked.parse(md)}</div>`; } catch (e) {}
+  return `<pre class="md" style="white-space:pre-wrap">${escapeHtml(md)}</pre>`;
+}
+
+function showModal(taskName, domain) {
+  const key = `${domain}/${taskName}`, meta = DETAILS.tasks[key] || {}, t = tasks.find(x => x.task === taskName && x.domain === domain);
+  document.getElementById('modal-header').innerHTML = `<h2>${escapeHtml(taskName)}</h2><span class="domain-badge ${domain}">${DOMAIN_LABEL(domain)}</span>
+    ${meta.was_corrected === 'yes' ? '<span class="pill yes" style="margin-left:8px">corrected in Oct 2026</span>' : '<span class="pill no" style="margin-left:8px">unchanged task</span>'}`;
+  const facts = kvRows([
+    ['Evaluation metric', meta.metric ? escapeHtml(meta.metric) : null],
+    ['Split (held-out unit)', meta.split ? escapeHtml(meta.split) : null],
+    ['Multi-modal (paper standard)', meta.is_multimodal_paper_standard ? pill(meta.is_multimodal_paper_standard) : null],
+    ['Multi-source (paper standard)', meta.is_multisource_paper_standard ? pill(meta.is_multisource_paper_standard) : null],
+    ['Number of input sources', meta.n_input_sources],
+    ['Input sources', meta.input_sources ? escapeHtml(meta.input_sources).replace(/ \| /g, '<br>') : null],
+    ['Modalities considered', meta.modalities_considered ? escapeHtml(meta.modalities_considered) : null],
+    ['Train units (current)', fmtNum(meta.train_units_updated != null ? Number(meta.train_units_updated) || meta.train_units_updated : null)],
+    ['Test units (current)', fmtNum(meta.test_units_updated != null ? Number(meta.test_units_updated) || meta.test_units_updated : null)],
+    ['Unit definition', meta.count_basis ? escapeHtml(meta.count_basis) : null],
+    ['Train / test containers', meta.train_container_count ? `${fmtNum(meta.train_container_count)} / ${fmtNum(meta.test_container_count)}` : null],
+    ['Train / test observations', meta.train_observation_count ? `${fmtNum(meta.train_observation_count)} / ${fmtNum(meta.test_observation_count)}` : null],
+    ['Train labeled relations', meta.train_labeled_relation_count ? fmtNum(meta.train_labeled_relation_count) : null],
+    ['Test prediction rows', meta.test_prediction_row_count ? fmtNum(meta.test_prediction_row_count) : null],
+    ['Files given to the agent (public/)', (meta.public_files || []).map(f => `<code>${escapeHtml(f)}</code>`).join(' ')],
+  ]);
+  const strip = agents.map(a => {
+    const v = t ? t[a.key] : null, fail = t && t[a.key + '_status'] === 'Fail';
+    return `<div class="score-card" style="cursor:pointer" onclick="showCell('${key}','${a.key}')">
+      <div class="agent-label" style="color:${a.color}">${escapeHtml(a.name)}</div>
+      <div class="agent-score" style="color:${fail ? 'var(--red)' : a.color}">${fail ? 'Failed' : (v != null ? (v * 100).toFixed(1) + '%' : '--')}</div></div>`;
+  }).join('');
+  document.getElementById('modal-body').innerHTML = `
+    <h3>Task facts</h3><table class="kv">${facts}</table>
+    <h3>Scores (click a card for run details)</h3><div class="scores-grid">${strip}</div>
+    <h3 style="margin-top:16px">Task description given to the agent <span style="color:var(--text2);font-weight:400;font-size:0.8em">(public/description.md)</span></h3>
+    ${renderMd(meta.description_md || '(no description found)')}`;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+function showCell(taskKey, agentKey) {
+  const a = agents.find(x => x.key === agentKey), d = (DETAILS.cells[agentKey] || {})[taskKey] || {};
+  const [domain, task] = taskKey.split('/');
+  const met = d.eval_metric || {};
+  document.getElementById('modal-header').innerHTML = `<h2 style="color:${a.color}">${escapeHtml(a.name)}</h2>
+    <div style="margin-top:4px"><span class="task-link" onclick="showModal('${task}','${domain}')">${escapeHtml(task)}</span>
+    <span class="domain-badge ${domain}" style="margin-left:8px">${DOMAIN_LABEL(domain)}</span>
+    <span class="pill ${d.ok ? 'ok' : 'fail'}" style="margin-left:8px">${d.ok ? 'scored' : 'failed — counted as 0'}</span></div>`;
+  let fail = '';
+  if (!d.ok) {
+    const parts = [];
+    if (d.fail_reason) parts.push(`<b>Scoring:</b> ${escapeHtml(d.fail_reason)}`);
+    if (d.failed_error) parts.push(`<b>FAILED.json:</b> ${escapeHtml(d.failed_error)}`);
+    if (d.failed_missing) parts.push(`<b>Missing required outputs:</b> ${d.failed_missing.map(escapeHtml).join(', ')}`);
+    if (d.r_error) parts.push(`<b>Runner:</b> ${escapeHtml(d.r_error)}`);
+    if (d.eval_remark && d.eval_status && d.eval_status !== 'Succeed') parts.push(`<b>Evaluator:</b> ${escapeHtml(d.eval_remark)}`);
+    if (d.failed_exit_code != null) parts.push(`<b>Exit code:</b> ${d.failed_exit_code}`);
+    fail = `<h3>Why it failed</h3><div class="failbox">${parts.join('<br>') || 'No failure record found.'}</div>`;
+  }
+  const score = kvRows([
+    ['Normalized Score (0–1)', d.score != null ? `<b>${d.score.toFixed(4)}</b> (${(d.score * 100).toFixed(2)}%)` : null],
+    ['Raw Score', d.raw != null ? `<b>${Number(d.raw).toFixed(6)}</b>` : (d.ok ? '— (not recorded)' : '— (no valid submission)')],
+    ['Evaluation metric', escapeHtml(met.name || d.metric_name || '') || null],
+    ['Metric direction', met.direction ? escapeHtml(met.direction) : null],
+    ['Normalization to 0–1', met.normalization ? escapeHtml(met.normalization) : null],
+    ['Manual adjustment', d.adjustment ? `<span class="adj">${escapeHtml(d.adjustment)}</span>` : null],
+  ]);
+  const wall = d.r_duration_sec != null ? d.r_duration_sec : d.failed_duration_sec;
+  const run = kvRows([
+    ['Wall-clock time of the agent run', wall != null ? fmtSec(wall) + (wall > 7200 ? ' <span class="pill fail">over the 2 h limit</span>' : '') : null],
+    ['Solution generation time (agent-reported)', d.m_solution_generation_time_sec != null ? fmtSec(d.m_solution_generation_time_sec) : null],
+    ['Training time (agent-reported)', d.m_train_time_sec != null ? fmtSec(d.m_train_time_sec) : null],
+    ['Inference / test time (agent-reported)', d.m_test_time_sec != null ? fmtSec(d.m_test_time_sec) : null],
+    ['Total code run time (agent-reported)', d.m_code_total_time_sec != null ? fmtSec(d.m_code_total_time_sec) : null],
+    ['Input tokens (runner log)', d.r_input_tokens != null ? fmtNum(d.r_input_tokens) : null],
+    ['Output tokens (runner log)', d.r_output_tokens != null ? fmtNum(d.r_output_tokens) : null],
+    ['Input tokens (metrics.json)', d.m_input_tokens != null ? fmtNum(d.m_input_tokens) : null],
+    ['Output tokens (metrics.json)', d.m_output_tokens != null ? fmtNum(d.m_output_tokens) : null],
+    ['Agent turns', d.r_num_turns != null ? fmtNum(d.r_num_turns) : null],
+    ['Attempts used', d.r_attempts_used != null ? fmtNum(d.r_attempts_used) : null],
+    ['Runner status / exit code', d.r_status ? `${escapeHtml(d.r_status)}${d.r_exit_code != null ? ' / ' + d.r_exit_code : ''}${d.r_result_subtype ? ' / ' + escapeHtml(d.r_result_subtype) : ''}` : null],
+  ]);
+  const method = kvRows([
+    ['ML model used (agent-reported)', d.m_model_used ? `<b>${escapeHtml(String(d.m_model_used))}</b>` : null],
+    ['Model parameter count', d.m_model_param_count != null ? fmtNum(d.m_model_param_count) : null],
+    ['Agent notes (features, validation, …)', d.m_notes ? `<div style="white-space:pre-wrap">${escapeHtml(d.m_notes)}</div>` : null],
+  ]);
+  const prov = kvRows([
+    ['Result round used for scoring', d.source_round ? `<code>${escapeHtml(d.source_round)}</code>` : null],
+    ['Run directory', d.run_dir ? `<code style="word-break:break-all">${escapeHtml(d.run_dir)}</code>` : null],
+    ['Runner summary file', d.r_summary_file ? `<code>${escapeHtml(d.r_summary_file)}</code>` : null],
+    ['Background-process wait (STELLA rule)', d.note_background_wait ? `<code style="white-space:pre-wrap">${escapeHtml(d.note_background_wait)}</code>` : null],
+    ['Leftover processes killed', d.note_killed_leftover_processes ? `<code style="white-space:pre-wrap">${escapeHtml(d.note_killed_leftover_processes)}</code>` : null],
+    ['Files in the run directory', (d.files || []).length ? d.files.map(f => `<code>${escapeHtml(f)}</code>`).join(' ') : null],
+  ]);
+  document.getElementById('modal-body').innerHTML = `${fail}
+    <h3>Score</h3><table class="kv">${score}</table>
+    ${run ? `<h3>Run statistics</h3><table class="kv">${run}</table>` : ''}
+    ${method ? `<h3>Method</h3><table class="kv">${method}</table>` : ''}`;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+</script>
+</body>
+</html>

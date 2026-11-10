@@ -52,7 +52,7 @@ model itself.
 
 ## Leaderboard
 
-The interactive leaderboard, with per-domain, scaffold &times; backbone and per-task views, is at
+The interactive leaderboard (ranking, performance by domain, per-task scores, and pop-ups with each task's description and each run's details) is at
 **[mbzuai-ai4bio.github.io/BioXArena-Pro](https://mbzuai-ai4bio.github.io/BioXArena-Pro/)**. Scores are &times;100 on a
 common higher-is-better 0&ndash;100 scale; a failed run scores 0. Agent time is the wall-clock time summed over the 64 tasks; tokens are in millions (input includes cached prompt tokens). The per-task best of the 22 configurations averages 57.0.
 

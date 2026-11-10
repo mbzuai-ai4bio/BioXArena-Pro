@@ -78,7 +78,7 @@ for i, r in enumerate(lb):
     sc_all = [rows[k][key] for k in task_keys]
     ok_tasks = [rows[k][key] for k in task_keys if rows[k].get(key + "_status") != "Fail"]
     dm = {d_: sum(rows[k][key] for k in task_keys if k.startswith(d_ + "/")) / 8 for d_ in DOM}
-    summaries.append({"key": key, "display": name, "color": agents[-1]["color"], "group": GROUP[scaf], "status": "final",
+    summaries.append({"key": key, "scaffold": r["scaffold"], "backbone": r["backend"], "display": name, "color": agents[-1]["color"], "group": GROUP[scaf], "status": "final",
                       "total": 64, "succeeded": int(r["ok"]), "sub_count": 64, "eval_ok": int(r["ok"]),
                       "mean_succ": sum(ok_tasks) / max(1, len(ok_tasks)), "mean_all": sum(sc_all) / 64,
                       "domain_avg": sum(dm.values()) / 8, "domains": dm})

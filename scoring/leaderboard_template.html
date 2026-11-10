@@ -25,13 +25,18 @@
   .stat .label { font-size:0.85em; color:var(--text2); }
 
   .summary-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; margin-bottom:32px; }
-  .designs { display:grid; grid-template-columns:1fr; gap:16px; margin:8px 0 32px; }
-  .design { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:18px 20px; }
-  .design h3 { font-size:1.05em; margin-bottom:4px; } .design p { color:var(--text2); font-size:0.85em; margin-bottom:12px; }
-  .design table { font-size:0.88em; table-layout:fixed; } .design th { text-align:center !important; } .design th:first-child { text-align:left !important; } .design th { position:static; text-transform:none; letter-spacing:0; font-size:0.82em; cursor:default; padding:8px 10px; }
-  .design td { padding:8px 10px; text-align:center; font-variant-numeric:tabular-nums; } .design td.rl { text-align:left; font-weight:600; }
-  .design td.mean, .design th.mean { font-weight:700; background:rgba(110,118,129,0.12); }
+  .designs { display:flex; flex-wrap:wrap; gap:16px; margin:8px 0 32px; align-items:stretch; }
+  .design { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px 18px; flex:1 1 440px; display:flex; flex-direction:column; align-items:center; }
+  .design h3 { font-size:1em; margin-bottom:4px; align-self:flex-start; } .design p { color:var(--text2); font-size:0.82em; margin-bottom:12px; align-self:flex-start; }
+  .design table { width:auto; border-collapse:separate; border-spacing:3px; font-size:0.88em; }
+  .design th { position:static; background:none; text-transform:none; letter-spacing:0; font-size:0.78em; cursor:default; padding:4px 6px; text-align:center; white-space:normal; max-width:96px; }
+  .design td { border:none; padding:7px 6px; text-align:center; font-variant-numeric:tabular-nums; width:86px; border-radius:4px; }
+  .design td.rl { text-align:left; font-weight:600; width:auto; padding-right:12px; }
+  .design td.sec, .design th.sec { color:var(--yellow); font-weight:700; background:rgba(210,153,34,0.10); }
+  .design th.sec { background:none; }
+  .design td.gap { width:6px; padding:0; background:none; }
   .design td.top { outline:2px solid var(--green); outline-offset:-2px; font-weight:700; }
+  .design small { color:rgba(230,237,243,0.78); font-size:0.78em; }
   .card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; }
   .card h3 { font-size:0.9em; color:var(--text2); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; }
   .card .name { font-size:1.3em; font-weight:600; margin-bottom:4px; }
@@ -153,12 +158,12 @@
 
 <h2 class="section-title">Two experimental designs</h2>
 <div class="designs">
-  <div class="design"><h3>Vendor coding CLIs, each with two backbones from its own vendor</h3>
-  <p>Mean score over the 64 tasks (&times;100). The OpenCode column runs the open-source coding CLI with the same newer backbone, isolating the vendor CLI itself.</p>
-  <div class="table-wrapper"><table id="design-vendor"></table></div></div>
+  <div class="design"><h3>Vendor coding CLIs &times; two backbones of their own vendor</h3>
+  <p>Mean score over the 64 tasks (&times;100); yellow cells are the CLI means (rows) and the means of the older and newer backbones (columns).</p>
+  <table id="design-vendor"></table></div>
   <div class="design"><h3>Four model-agnostic scaffolds &times; four backbones</h3>
-  <p>Mean score over the 64 tasks (&times;100), with row means (which scaffold is best) and column means (which backbone is best); the best cell is outlined.</p>
-  <div class="table-wrapper"><table id="design-grid"></table></div></div>
+  <p>Mean score over the 64 tasks (&times;100); yellow cells are the scaffold means (rows) and backbone means (columns); the best configuration is outlined.</p>
+  <table id="design-grid"></table></div>
 </div>
 
 <div class="domain-chart" id="domain-section">
@@ -239,20 +244,26 @@ const agentDescriptions = DESCRIPTIONS;
 function renderDesigns() {
   const m = (sc, bb) => { const s = summaries.find(x => x.scaffold === sc && x.backbone === bb); return s ? s.mean_all * 100 : null; };
   const f = v => v == null ? '&mdash;' : (Math.round(v * 10 + 1e-9) / 10).toFixed(1);
-  const heat = v => v == null ? '' : `background:rgba(88,166,255,${Math.max(0.06, Math.min(0.8, (v - 30) / 32)).toFixed(2)})`;
+  const sg = v => (v >= 0 ? '+' : '&minus;') + f(Math.abs(v));
+  const heat = v => v == null ? '' : `background:rgba(88,166,255,${Math.max(0.08, Math.min(0.85, (v - 30) / 30)).toFixed(2)})`;
   const V = [['Codex CLI', 'GPT-5.6 Sol', 'GPT-6 Astra'], ['Claude Code', 'Claude Opus 5', 'Claude Opus 5.5'], ['Gemini CLI', 'Gemini 3.1 Pro (preview)', 'Gemini 3.8 Flash']];
-  let h = '<tr><th>Vendor CLI</th><th>Older backbone</th><th>Newer backbone</th><th>Newer &minus; older</th><th>OpenCode, newer backbone</th><th>CLI &minus; OpenCode</th></tr>';
+  const sh = x => x.replace('Claude ', '').replace(' (preview)', '');
+  let h = '<tr><th></th><th>Older backbone</th><th>Newer backbone</th><td class="gap"></td><th class="sec">CLI mean</th></tr>';
+  const olds = [], news = [];
   V.forEach(([cli, o, n]) => {
-    const a = m(cli, o), b = m(cli, n), c = m('OpenCode', n), sh = x => x.replace('Claude ', '').replace(' (preview)', '');
-    h += `<tr><td class="rl">${cli}</td><td style="${heat(a)}">${f(a)}<br><small style="color:var(--text2)">${sh(o)}</small></td><td style="${heat(b)}">${f(b)}<br><small style="color:var(--text2)">${sh(n)}</small></td>` +
-         `<td>${(b - a >= 0 ? '+' : '') + f(b - a)}</td><td style="${heat(c)}">${f(c)}</td><td>${(b - c >= 0 ? '+' : '') + f(b - c)}</td></tr>`;
+    const a = m(cli, o), b = m(cli, n); olds.push(a); news.push(b);
+    h += `<tr><td class="rl">${cli}</td><td style="${heat(a)}">${f(a)}<br><small>${sh(o)}</small></td><td style="${heat(b)}">${f(b)}<br><small>${sh(n)}</small></td><td class="gap"></td><td class="sec">${f((a + b) / 2)}</td></tr>`;
   });
+  const avg = xs => xs.reduce((p, c) => p + c) / xs.length;
+  h += '<tr><td class="gap" colspan="5" style="height:4px"></td></tr>';
+  h += `<tr><td class="rl" style="color:var(--yellow)">Backbone mean</td><td class="sec">${f(avg(olds))}</td><td class="sec">${f(avg(news))}</td><td class="gap"></td><td></td></tr>`;
   document.getElementById('design-vendor').innerHTML = h;
   const S = ['OpenCode', 'Biomni', 'MLEvolve', 'Minimal'], B = ['Claude Opus 5.5', 'GPT-6 Astra', 'Gemini 3.8 Flash', 'DeepSeek V4.1 Flash (1017)'];
   const all = S.flatMap(s => B.map(b => m(s, b))), best = Math.max(...all);
-  let g = '<tr><th>Scaffold \\ backbone</th>' + B.map(b => `<th>${b.replace('Claude ', '').replace(' (1017)', '')}</th>`).join('') + '<th class="mean">Scaffold mean</th></tr>';
-  S.forEach(s => { const v = B.map(b => m(s, b)); g += `<tr><td class="rl">${s}</td>` + v.map(x => `<td class="${x === best ? 'top' : ''}" style="${heat(x)}">${f(x)}</td>`).join('') + `<td class="mean">${f(v.reduce((a, c) => a + c) / v.length)}</td></tr>`; });
-  g += '<tr><td class="rl mean">Backbone mean</td>' + B.map(b => `<td class="mean">${f(S.map(s => m(s, b)).reduce((a, c) => a + c) / S.length)}</td>`).join('') + '<td class="mean"></td></tr>';
+  let g = '<tr><th></th>' + B.map(b => `<th>${b.replace('Claude ', '').replace(' (1017)', '')}</th>`).join('') + '<td class="gap"></td><th class="sec">Scaffold mean</th></tr>';
+  S.forEach(s => { const v = B.map(b => m(s, b)); g += `<tr><td class="rl">${s}</td>` + v.map(x => `<td class="${x === best ? 'top' : ''}" style="${heat(x)}">${f(x)}</td>`).join('') + `<td class="gap"></td><td class="sec">${f(v.reduce((a, c) => a + c) / v.length)}</td></tr>`; });
+  g += '<tr><td class="gap" colspan="6" style="height:4px"></td></tr>';
+  g += '<tr><td class="rl" style="color:var(--yellow)">Backbone mean</td>' + B.map(b => `<td class="sec">${f(S.map(s => m(s, b)).reduce((a, c) => a + c) / S.length)}</td>`).join('') + '<td class="gap"></td><td></td></tr>';
   document.getElementById('design-grid').innerHTML = g;
 }
 

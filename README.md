@@ -11,7 +11,8 @@
 
 **BioXArena-Pro** is a benchmark of **64 research-level biomedical machine-learning tasks in 8 domains** (chemical biology,
 imaging, network biology, perturbation, phenotype-disease, sequence and genomics, single-cell and spatial, structure; 8 tasks
-each). Every task is rebuilt from a published study with its native data, and most hold out a whole biological unit such as a
+each) and the harder successor of [BioXArena](https://github.com/mbzuai-ai4bio/BioXArena) (NeurIPS 2026 Evaluations and
+Datasets Track). Every task is rebuilt from a published study with its native data, and most hold out a whole biological unit such as a
 species, cohort, donor or cell line. An agent receives the task files, one GPU and two hours, and must write and run code that
 returns predictions for a held-out test set; test labels stay private and are scored on
 [Codabench](https://www.codabench.org/competitions/18583/). This repository contains the evaluation harness for seven agent
@@ -33,8 +34,7 @@ b, domain means; c, scaffold &times; backbone design; d, vendor CLIs against Ope
 
 ## Highlights
 
-BioXArena-Pro is the harder successor of [BioXArena](https://github.com/mbzuai-ai4bio/BioXArena) (NeurIPS 2026 Evaluations and
-Datasets Track). Compared with BioXArena:
+Compared with BioXArena:
 
 - **Harder, more realistic tasks.** 83% of tasks hold out a whole group of related samples (BioXArena: 66%), the median task
   has about twice as much training data, 84% link native-format data files rather than a single table, and no task is near

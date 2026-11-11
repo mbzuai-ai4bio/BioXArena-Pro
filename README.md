@@ -1,6 +1,7 @@
 # BioXArena-Pro: a research-grade benchmark for autonomous biomedical machine learning agents
 
 <p align="center">
+  <a href="https://arxiv.org/abs/2611.13994"><img src="https://img.shields.io/badge/arXiv-2611.13994-b31b1b.svg" alt="arXiv"></a>
   <a href="https://mbzuai-ai4bio.github.io/BioXArena-Pro/"><img src="https://img.shields.io/badge/Leaderboard-interactive-blue.svg" alt="Leaderboard"></a>
   <a href="https://huggingface.co/datasets/mbzuai-ai4bio/BioXArena-Pro-Public"><img src="https://img.shields.io/badge/%F0%9F%A4%97-Dataset-yellow.svg" alt="Hugging Face Dataset"></a>
   <a href="https://www.codabench.org/competitions/18583/"><img src="https://img.shields.io/badge/Codabench-submit-orange.svg" alt="Codabench"></a>
@@ -294,7 +295,8 @@ benchmark_layout.py      canonical domain / task list
 @article{li2026bioxarenapro,
   title={{BioXArena-Pro: a research-grade benchmark for autonomous biomedical machine learning agents}},
   author={Li, Loka and Zhang, Duzhen and Du, Xingbo and Song, Leonard and Zhang, Kun and Song, Le},
+  journal={arXiv preprint arXiv:2611.13994},
   year={2026},
-  note={manuscript under review}
+  url={https://arxiv.org/abs/2611.13994}
 }
 ```

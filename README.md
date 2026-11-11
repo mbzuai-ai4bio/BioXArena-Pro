@@ -2,6 +2,7 @@
 
 <p align="center">
   <a href="https://arxiv.org/abs/2611.13994"><img src="https://img.shields.io/badge/arXiv-2611.13994-b31b1b.svg" alt="arXiv"></a>
+  <a href="https://mbzuai-ai4bio.github.io/BioXArena-Pro-ProjectPage/"><img src="https://img.shields.io/badge/Project-page-0f766e.svg" alt="Project page"></a>
   <a href="https://mbzuai-ai4bio.github.io/BioXArena-Pro/"><img src="https://img.shields.io/badge/Leaderboard-interactive-blue.svg" alt="Leaderboard"></a>
   <a href="https://huggingface.co/datasets/mbzuai-ai4bio/BioXArena-Pro-Public"><img src="https://img.shields.io/badge/%F0%9F%A4%97-Dataset-yellow.svg" alt="Hugging Face Dataset"></a>
   <a href="https://www.codabench.org/competitions/18583/"><img src="https://img.shields.io/badge/Codabench-submit-orange.svg" alt="Codabench"></a>

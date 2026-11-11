@@ -118,7 +118,7 @@ tpl = (Path(__file__).with_name("leaderboard_template.html")).read_text()
 R = [("<title>BioXArena Leaderboard</title>", "<title>BioXArena-Pro Leaderboard</title>"),
      ("<h1>Bio<span>X</span>Arena Leaderboard</h1>", "<h1>Bio<span>X</span>Arena-Pro Leaderboard</h1>"),
      ("Main results of the NeurIPS 2026 paper (Figure 3): 18 agent / backbone configurations on the 76 BioXArena tasks across 9 domains.",
-      "Main results of the <a href=\"https://arxiv.org/abs/2611.13994\" style=\"color:var(--accent)\">paper</a> (Fig. 2): 22 agent / backbone configurations on the 64 BioXArena-Pro tasks across 8 domains."),
+      "Main results of the <a href=\"https://arxiv.org/abs/2611.13994\" style=\"color:var(--accent)\">paper</a>: 22 agent / backbone configurations on the 64 BioXArena-Pro tasks across 8 domains."),
      ('id="stat-tasks">76<', 'id="stat-tasks">64<'), ('id="stat-domains">9<', 'id="stat-domains">8<'),
      ("tasks (out of 76) whose", "tasks (out of 64) whose"), ("over all 76 tasks", "over all 64 tasks"),
      ("Per-task scores (76 tasks &times; 18 configs)", "Per-task scores (64 tasks &times; 22 configs)"),

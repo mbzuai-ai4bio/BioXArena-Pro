@@ -124,7 +124,7 @@ R = [("<title>BioXArena Leaderboard</title>", "<title>BioXArena-Pro Leaderboard<
      ("Per-task scores (76 tasks &times; 18 configs)", "Per-task scores (64 tasks &times; 22 configs)"),
      ("BioXArena — Multi-modal Biomedical Benchmark for LLM Agents", "BioXArena-Pro — a research-grade benchmark for autonomous biomedical machine learning agents"),
      ('<a href="https://mbzuai-ai4bio.github.io/BioXArena-ProjectPage/" style="color:var(--accent)">Project page</a> &middot; <a href="https://github.com/mbzuai-ai4bio/BioXArena" style="color:var(--accent)">Code</a>',
-      '<a href="https://github.com/mbzuai-ai4bio/BioXArena-Pro" style="color:var(--accent)">Code</a> &middot; <a href="https://huggingface.co/datasets/mbzuai-ai4bio/BioXArena-Pro-Public" style="color:var(--accent)">Data</a> &middot; <a href="https://www.codabench.org/competitions/18583/" style="color:var(--accent)">Codabench</a>'),
+      '<a href="https://arxiv.org/abs/2611.13994" style="color:var(--accent)">Paper (arXiv:2611.13994)</a> &middot; <a href="https://github.com/mbzuai-ai4bio/BioXArena-Pro" style="color:var(--accent)">Code</a> &middot; <a href="https://huggingface.co/datasets/mbzuai-ai4bio/BioXArena-Pro-Public" style="color:var(--accent)">Data</a> &middot; <a href="https://www.codabench.org/competitions/18583/" style="color:var(--accent)">Codabench</a>'),
      ("document.getElementById('update-date').textContent = '2026-10-13';", "document.getElementById('update-date').textContent = '2026-11-10';"),
      ('const doms = ["chemical-biology", "imaging", "network-biology", "perturbation-dynamics", "phenotype-disease", "sequence", "single-cell", "structure", "text-integrated"];',
       "const doms = " + json.dumps(DOM) + ";"),
